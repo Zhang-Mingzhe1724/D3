@@ -1,0 +1,41 @@
+import numpy as np
+import scipy.linalg  # 用于求解代数黎卡提方程 (ARE)
+
+# --- 1. 物理参数 ---
+g = 9.81
+M = 1.0
+m = 0.1
+L = 0.5
+
+# --- 2. 动态构建线性化矩阵 A 和 B ---
+denom = M + (4.0 / 3.0) * m
+
+A = np.array(
+    [
+        [0, 1, 0, 0],
+        [0, 0, -(m * g) / denom, 0],
+        [0, 0, 0, 1],
+        [0, 0, (g * (M + m)) / (L * denom), 0],
+    ]
+)
+
+B = np.array([[0], [(4.0 / 3.0) / denom], [0], [-1.0 / (L * denom)]])
+
+# --- 3. 设定 Q 和 R 扣分权重 ---
+Q = np.diag([20.0, 1.0, 100.0, 1.0])  # 状态惩罚
+R = np.array([[0.1]])  # 控制能量惩罚
+
+# --- 4. 解代数黎卡提方程，动态计算 K 值 ---
+# A^T * P + P * A - P * B * R^-1 * B^T * P + Q = 0
+P = scipy.linalg.solve_continuous_are(A, B, Q, R)
+
+# 求解反馈矩阵 K = R^-1 * B^T * P
+K = np.linalg.inv(R) @ B.T @ P
+
+# 提取 4 个增益值
+k_x = -K[0, 0]
+k_xdot = -K[0, 1]
+k_theta = -K[0, 2]
+k_thetadot = -K[0, 3]
+
+print(f"动态计算出的 K 向量: {K}")
