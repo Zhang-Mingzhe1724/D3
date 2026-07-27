@@ -12,10 +12,10 @@ dt = 0.02     # 時間ステップ長 (s)
 time_steps = 400 
 
 # --- 2. 初期状態 ---  数値が調節可能
-x = -0.5       # 台車の初期位置 (m)  0
+x = 0.0       # 台車の初期位置 (m)  0
 x_dot = 0.0   # 台車の初期速度 (m/s)  0
-theta = np.radians(10.0) # 初期の振子偏角 8度 (ラジアンに変換)  8
-theta_dot = 3.0 # 振子の初期角速度 (rad/s)  0
+theta = np.radians(20.0) # 初期の振子偏角 20度 (ラジアンに変換)  20
+theta_dot = 0.0 # 振子の初期角速度 (rad/s)  0
 # theta_dot = np.radians(30.0)
 
 # --- 2. 动态构建线性化矩阵 A 和 B ---
@@ -31,8 +31,8 @@ A = np.array([
 B = np.array([[0], [4.0 / denom], [0], [-3.0 / (L * denom)]])
 
 # --- 3. 设定 Q 和 R 扣分权重 ---
-Q = np.diag([10.0, 1.0, 60.0, 1.0])  # 状态惩罚
-R = np.array([[3.5]])  # 控制能量惩罚
+Q = np.diag([20.0, 0.0, 10.0, 0.0])  # 状态惩罚
+R = np.array([[1.0]])  # 控制能量惩罚
 
 # --- 4. 解代数黎卡提方程，动态计算 K 值 ---
 # A^T * P + P * A - P * B * R^-1 * B^T * P + Q = 0
@@ -47,13 +47,20 @@ K_vec = K[0]
 history_x = []
 history_theta = []
 
+b_pole = 0.05  # 轴承阻尼
+
 # --- 4. 物理シミュレーションループ ---
-for _ in range(time_steps):
+for step in range(time_steps):
     # ------------------ 【重要な修正】LQRの前にマイナス符号を追加 ------------------
     # 制御フィードバックの方向を現在の物理エンジンの座標系に強制的に合わせる！
+
+    # 【新增功能】：每隔 2.5 秒 (125 步) 施加一次脉冲干扰（模拟踢了摆杆一下）
+    t = step * dt
+    if step > 0 and step % 125 == 0:
+        theta_dot += np.radians(20.0)  # 瞬时角速度冲击
     u = -np.dot(K_vec, [x, x_dot, theta, theta_dot])    
     u = np.clip(u, -50.0, 50.0) # 制御力（推力）を -50N から 50N の範囲に制限
-    
+
     Sx = np.sin(theta)
     Cx = np.cos(theta)
     
@@ -63,7 +70,7 @@ for _ in range(time_steps):
     # 1. 角加速度の計算
     # theta_ddot = (g * Sx - Cx * temp) / (L * (4.0/3.0 - (m * Cx**2) / (M + m)))
     # 在 physics loop 循环内部修改角加速度计算：
-    b_pole = 0.1  # 摆杆轴承的阻尼系数 (摩擦力)
+    # b_pole = 0.1  # 摆杆轴承的阻尼系数 (摩擦力)
 
     # 在求 theta_ddot 时，扣除由角速度产生的摩擦阻尼力矩:
     theta_ddot = (g * Sx - Cx * temp - b_pole * theta_dot) / (L * (4.0/3.0 - (m * Cx**2) / (M + m)))
