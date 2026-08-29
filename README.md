@@ -47,6 +47,7 @@ $$u = -\mathbf{K}\mathbf{x} = -\left( k_x x + k_{\dot{x}} \dot{x} + k_\theta \th
 
 ```bash
 pip install numpy scipy matplotlib
+```
 
 
 🚀 実行方法 (How to Run)
