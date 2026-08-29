@@ -52,12 +52,12 @@ pip install numpy scipy matplotlib
 
 🚀 実行方法 (How to Run)
 
-1. メインシミュレーションの実行（外乱・摩擦あり）
-python simulation_control_scipy_4.py
+1. メインシミュレーションの実行（外乱・摩擦あり）<br>
+python simulation_control_scipy_4.py<br>
 ※ 1.25秒周期の外乱衝撃と回転軸摩擦のもとで、LQR制御が振子を立て直すアニメーションが表示されます。
 
-3. LQR フィードバックゲイン $K$ の単体計算
+3. LQR フィードバックゲイン $K$ の単体計算<br>
 python scipy_test.py
 
-4. 制御なし（自由落下）の挙動確認
+4. 制御なし（自由落下）の挙動確認<br>
 python simulation_no_control.py
