@@ -8,11 +8,11 @@
 
 | ファイル名 | 概要・機能の説明 |
 | :--- | :--- |
-| **`simulation_control_scipy_4.py`** | **【メイン実行ファイル】** 軸受の粘性摩擦および1.25秒ごとのパルス外乱衝撃を含む、現実感を模したLQR制御アニメーション。 |
-| **`scipy_test.py`** | 物理パラメータから状態空間行列 $\mathbf{A}, \mathbf{B}$ を構築し、AREを解いて LQR フィードバックゲイン $\mathbf{K}$ を算出する計算スクリプト。 |
-| **`simulation_control.py`** | 算出済みの定数ゲイン $\mathbf{K}$ を用いた基本 LQR 制御シミュレーション。 |
-| **`simulation_no_control.py`** | 制御入力なし ($u=0$) 状態の自然落下・自由振晃動作（比較検証用）。 |
-| **`scipy_import_test.py`** | 実行環境（NumPy, Matplotlib）の動作確認用テストスクリプト。 |
+| **`simulation_control_scipy.py`** | **【メイン実行ファイル】** 代数リカッチ方程式（ARE）による LQR 動的制御、軸受粘性摩擦、1.25秒周期のパルス外乱を含む物理シミュレーション[cite: 11]。 |
+| **`scipy_test.py`** | 状態空間行列 $\mathbf{A}, \mathbf{B}$ を構築し、ARE を解いて LQR フィードバックゲイン $\mathbf{K}$ を算出・表示する計算スクリプト[cite: 9]。 |
+| **`simulation_control_OfflineCalculation.py`** | 算定済みの固定ゲイン $\mathbf{K}$（オフライン計算値）を直接使用して駆動する基本 LQR 制御シミュレーション[cite: 10]。 |
+| **`simulation_nocontrol.py`** | 制御入力なし ($u=0$) の状態における振子の自然落下・自由揺晃動作（比較検証用）[cite: 12]。 |
+| **`import_test.py`** | 実行環境（NumPy, Matplotlib）の正常動作を確認するためのテストスクリプト[cite: 8]。 |
 
 ---
 
@@ -50,14 +50,24 @@ pip install numpy scipy matplotlib
 ```
 
 
-🚀 実行方法 (How to Run)
+## 🚀 実行方法 (How to Run)
 
-1. メインシミュレーションの実行（外乱・摩擦あり）<br>
+### 1. メインシミュレーションの実行（外乱・摩擦あり）
+```bash
 python simulation_control_scipy_4.py<br>
+```
 ※ 1.25秒周期の外乱衝撃と回転軸摩擦のもとで、LQR制御が振子を立て直すアニメーションが表示されます。
 
-3. LQR フィードバックゲイン $K$ の単体計算<br>
+### 2. LQR フィードバックゲイン $K$ の単体計算
+```bash
 python scipy_test.py
-
-4. 制御なし（自由落下）の挙動確認<br>
+```
+### 3. オフライン計算ゲインによる基本 LQR 制御の実行
+```bash
+python simulation_control_OfflineCalculation.py
+```
+### 4. 制御なし（自由落下）の挙動確認
+```bash
 python simulation_no_control.py
+```
+
